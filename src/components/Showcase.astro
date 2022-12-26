@@ -1,0 +1,33 @@
+---
+//import logos from "../images/logos.png";
+//import logos_small from "../images/logos_small.png";
+
+export interface Props {
+    heading?: string;
+    text?: string;
+    showExtra?: boolean;
+}
+
+const {
+    heading = "Matt's Blog", 
+    text = "Where I put random shit",
+    showExtra = false,
+    } = Astro.props as Props;
+---
+<section class="showcase">
+    <div class="showcase-text">
+        <h1>{heading}</h1>
+        <p>
+            {text}
+        </p>
+    </div>
+
+    {showExtra && <> 
+    <div class="showcase-image">
+    {/* <img class="logos" src={logos} alt="" /> */}
+    {/* <img class="logos-small" src={logos_small} alt="" /> */}
+        <h2>Showing showcase</h2>
+    </div>
+    </>}
+
+</section>
