@@ -1,11 +1,42 @@
 ---
-import Header from "../components/Header.astro";
 import Layout from "../layouts/Layout.astro";
 import Showcase from "../components/Showcase.astro";
 import Features from "../components/Features.astro";
-import Footer from "../components/Footer.astro";
+import Card from "../components/Card.astro";
+const posts = await Astro.glob("../posts/*.md");
+posts.sort(function(a, b){return a.frontmatter.date - b.frontmatter.date});
+const latest_posts = posts.slice(0, 3);
 ---
-<Layout>
+<Layout title="Home">
 	<Showcase />
-	<Features />
+	<div>
+		<br>
+		Hi there!
+		<br>
+		I'm a software engineer and graduate CS student at Georgia Tech.
+		<br>
+		Before programming, I was an International Business student at Temple University, Japan while living in Tokyo.
+		<br>
+		Before that, I served in the US Marine Corps for four years, based in Okinawa, Japan.
+		<br>
+		I write blogs about coding, my life, contributing to open-source, and other things I find intersting.
+	</div>
+	<div>
+		<h2>Recent posts</h2> <a href="/blog">View all</a>
+
+        <div class="container">
+            {latest_posts.map( post => (
+                <Card>
+                    <h3>{post.frontmatter.title}</h3>
+                    <div>{post.frontmatter.minutesRead}</div>
+                    <div>
+                    { new Date(post.frontmatter.date).toLocaleDateString()}
+                    </div>
+                    <p>{post.frontmatter.excerpt}</p>
+                    <a class="btn" href={`/${post.frontmatter.slug}`}>Read More</a>
+                </Card>
+            ))}
+
+        </div>
+	</div>
 </Layout>

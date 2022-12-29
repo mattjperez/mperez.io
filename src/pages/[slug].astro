@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
+
 export async function getStaticPaths() {
     const posts = await Astro.glob("../posts/*.md");
     return posts.map(post => ({
@@ -23,8 +24,7 @@ const { Content, frontmatter } = Astro.props.post;
                 <a class="btn" href="/blog">Go Back</a>
                 <h2>{frontmatter.title}</h2>
                 <div>
-                    Written by <strong>{frontmatter.author} </strong> on { new Date(frontmatter.date).toLocaleDateString()}
-                </div>
+                    Time to read {frontmatter.minutesRead} { new Date(frontmatter.date).toLocaleDateString()} </div>
                 <Content />
             </Card>
         </div>
