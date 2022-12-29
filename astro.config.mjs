@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import { remarkReadingTime } from './src/utils/remark-reading-time.mjs';
 
 export default defineConfig({
+  site: 'https://www.mperez.io',
   markdown: {
     // Applied to .md and .mdx files
     remarkPlugins: [remarkReadingTime],
