@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
+import Comments from "../components/Comments.astro";
 
 export async function getStaticPaths() {
     const posts = await Astro.glob("../posts/*.md");
@@ -27,6 +28,7 @@ const { Content, frontmatter } = Astro.props.post;
                     Time to read {frontmatter.minutesRead} { new Date(frontmatter.date).toLocaleDateString()} </div>
                 <Content />
             </Card>
+            <Comments />
         </div>
     </section>
 </Layout>
