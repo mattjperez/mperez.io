@@ -33,7 +33,7 @@ the output is
 
 ```
 error[E0308]: `if` and `else` have incompatible types
-  --> ../cases/0.rs:14:46
+  --> ./cases/0.rs:14:46
    |
 14 |     let g = if n % 2 == 0 { &double } else { &triple };
    |                             -------          ^^^^^^^ expected fn item, found a different fn item
@@ -125,20 +125,22 @@ Now that the build has finished, we can compile something with our new binary.
 $ ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc some-example.rs
 ```
 
-This produces a `some-example` binary in the directory that rustc is run. You can change this behavior using rustc's `-o <FILENAME>` and `--out-dir <DIR>` options.
+This produces a `some-example` binary in the directory that rustc is run. 
+You can change this behavior using rustc's `-o <FILENAME>` and `--out-dir <DIR>` options.
 
-For convenience, I like keeping the `*.rs` files I use for testing and compiling in a separate folder. By default, a folder called `cases` is ignored within the main directory, but since we're using a worktree approach, this folder (and the files in it) will be worktree-specific.
-
-So I just create a folder up one directory up and keep all my files there.
+For convenience, I like keeping the `*.rs` files I use for testing and compiling in a separate folder. 
+By default, a folder called `cases` is ignored within the main directory, and since we're using a worktree approach, this folder (and the files in it) will be worktree-specific.
+This is rather convenient for keeping your files constrained to a single issue you're working on. 
 
 ```
 $ tree -L 1 . # rustlang/ 
-├── my-branch 
-├── master 
-└── cases # <--- here
+├── my-branch
+│   └── cases
+└── master
+.
 
 # we can then run a case from `my-branch`'s locally built compiler
-$ cd cases $ ../my-branch/build/x86_64-unknown-linux-gnu/stage1/bin/rustc some-example.rs
+$ ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc cases/some-example.rs
 ```
 
 After confirming that outputs from my local file on my locally built compiler are the same, we can start searching for where to start.
@@ -172,11 +174,11 @@ One flag that is useful for diagnostics is `-Ztreat-err-as-bug` .
 
 This crashes the program after encountering an error, providing us with a stacktrace we can use.
 
-Let's give it a try by running `./build/x86_64-unknown-linux-gnu/stage1/bin/rustc -Ztreat-err-as-bug ../cases/problem-example.rs`.
+Let's give it a try by running `./build/x86_64-unknown-linux-gnu/stage1/bin/rustc -Ztreat-err-as-bug cases/problem-example.rs`.
 
 ```
 error: internal compiler error: coercion error but no error emitted
-  --> ../cases/1.rs:37:46
+  --> cases/1.rs:37:46
    |
 37 |     let g = if n % 2 == 0 { &double } else { &triple };
    |                                              ^^^^^^^
@@ -369,7 +371,7 @@ Now we can view debug statemements by setting `RUSTC_LOG=debug` when we try to c
 Go ahead and give it a try. I'll wait.
 
 ```bash
-$ RUSTC_LOG=debug ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc ../cases/some-example.rs
+$ RUSTC_LOG=debug ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc cases/some-example.rs
 ```
 
 Lots of text, right?  
@@ -382,7 +384,7 @@ We can reduce the output by using filters for our logs.
 
 ```sh
 # emit debug traces for rustc_hir_typeck
-$ RUSTC_LOG=rustc_hir_typeck::coercion=debug ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc ../cases/some-example.rs
+$ RUSTC_LOG=rustc_hir_typeck::coercion=debug ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc cases/some-example.rs
 ```
 
 This still feels like a good amount of text, so let's add some print statements that we can easily search for and narrow down our search.
@@ -421,7 +423,7 @@ $ ./x.py build --keep-stage 1
 Once that's done, let's try it again.
 
 ```sh
-RUSTC_LOG=rustc_hir_typeck::coercion=debug ./build/x86_64-unknown-linux-gnu ../cases/some-example.rs > coercion.log 2>&1
+RUSTC_LOG=rustc_hir_typeck::coercion=debug ./build/x86_64-unknown-linux-gnu cases/some-example.rs > coercion.log 2>&1
 ```
 
 Now if we search for `mattjperez - cause.code()` we find this strange thing.
@@ -470,7 +472,7 @@ let mut diag = match failure_code {
 That `FailureCode::Error0308` matches something we've seen from our normal compiler error.
 
 ```
-// ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc ../cases/some-example.rs 
+// ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc cases/some-example.rs 
 
 error[E0308]: `if` and `else` have incompatible types --> src/main.rs:13:9 ...
 ```
